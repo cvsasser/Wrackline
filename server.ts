@@ -143,6 +143,9 @@ Return structured JSON according to the schema:
 
   // Vite development middleware vs Static Production
   if (process.env.NODE_ENV !== 'production') {
+    const publicPath = path.join(process.cwd(), 'public');
+    app.use(express.static(publicPath));
+
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
