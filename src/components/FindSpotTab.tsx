@@ -101,7 +101,9 @@ export const FindSpotTab: React.FC<FindSpotTabProps> = ({ savedFinds, apiKey }) 
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to search for locations.');
+        const mainErr = data.error || 'Failed to search for locations.';
+        const detailedErr = data.details ? ` — ${data.details}` : '';
+        throw new Error(`${mainErr}${detailedErr}`);
       }
 
       setResult({
