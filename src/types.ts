@@ -8,7 +8,12 @@ export interface AlternateMatch {
 }
 
 export interface ShellIdentification {
+  visualAnalysis?: string;
+  isValidSpecimen?: boolean;
+  isValidShell?: boolean; // backwards compatibility
+  specimenType?: 'seashell' | 'coral' | 'sharkTooth' | 'other';
   commonName: string;
+  commonAliases?: string[];
   scientificName: string;
   family: string;
   confidence: number; // 0 to 1
@@ -43,3 +48,17 @@ export interface SampleShell {
   category: string;
   sampleData: ShellIdentification;
 }
+
+export interface GroundingSource {
+  title: string;
+  url: string;
+}
+
+export interface SpotLocationResult {
+  speciesName: string;
+  guide: string;
+  sources: GroundingSource[];
+  searchQueries?: string[];
+  userLocation?: { lat: number; lon: number } | null;
+}
+

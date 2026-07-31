@@ -70,7 +70,7 @@ export const deleteFind = (id: string): SavedFind[] => {
   return updated;
 };
 
-// Geolocation helper with fallback
+// Geolocation helper with reverse geocode fallback
 export const getCurrentBeachLocation = (): Promise<LocationInfo> => {
   return new Promise((resolve) => {
     if (!('geolocation' in navigator)) {
@@ -78,13 +78,44 @@ export const getCurrentBeachLocation = (): Promise<LocationInfo> => {
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const lat = parseFloat(position.coords.latitude.toFixed(4));
         const lng = parseFloat(position.coords.longitude.toFixed(4));
+        const fallbackName = `Beach Coordinates • ${lat}° N, ${Math.abs(lng)}° W`;
+
+        let placeName = fallbackName;
+        try {
+          const res = await fetch(`/api/reverse-geocode?lat=${lat}&lon=${lng}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.address) {
+              const mainLoc =
+                data.address.beach ||
+                data.address.natural ||
+                data.address.leisure ||
+                data.address.suburb ||
+                data.address.village ||
+                data.address.town ||
+                data.address.city;
+              const region = data.address.county || data.address.state || data.address.country;
+              const parts = [mainLoc, region].filter(Boolean);
+              if (parts.length > 0) {
+                placeName = parts.join(', ');
+              } else if (data.placeName) {
+                placeName = data.placeName.split(',').slice(0, 3).join(',');
+              }
+            } else if (data.placeName) {
+              placeName = data.placeName.split(',').slice(0, 3).join(',');
+            }
+          }
+        } catch (e) {
+          console.warn('Reverse geocoding call failed, using coordinate string:', e);
+        }
+
         resolve({
           latitude: lat,
           longitude: lng,
-          beachName: `Beach Coordinates • ${lat}° N, ${Math.abs(lng)}° W`,
+          beachName: placeName,
         });
       },
       (error) => {

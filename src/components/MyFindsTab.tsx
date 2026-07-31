@@ -179,9 +179,20 @@ export const MyFindsTab: React.FC<MyFindsTabProps> = ({
                     {/* Specimen Brief */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-1 mb-0.5">
-                        <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-[#16393D]/60">
-                          {find.identification.rarity}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {find.identification.specimenType && (
+                            <span className="text-[9px] font-sans font-bold uppercase tracking-wider px-1.5 py-0.2 rounded bg-[#16393D] text-[#FAF6ED]">
+                              {find.identification.specimenType === 'sharkTooth'
+                                ? 'Tooth'
+                                : find.identification.specimenType === 'coral'
+                                ? 'Coral'
+                                : 'Shell'}
+                            </span>
+                          )}
+                          <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-[#16393D]/60">
+                            {find.identification.rarity}
+                          </span>
+                        </div>
 
                         {find.identification.isProtectedSpecies && (
                           <span className="bg-[#D98C93] text-white text-[9px] font-bold px-1.5 py-0.2 rounded flex items-center gap-0.5">

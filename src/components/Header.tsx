@@ -1,12 +1,12 @@
 import React from 'react';
-import { Compass, Key, Shell, BookMarked } from 'lucide-react';
+import { Compass, Key, Shell, BookMarked, MapPin } from 'lucide-react';
 
 interface HeaderProps {
   apiKeySet: boolean;
   onOpenApiKeyModal: () => void;
   savedCount: number;
-  activeTab: 'scan' | 'finds';
-  onTabChange: (tab: 'scan' | 'finds') => void;
+  activeTab: 'scan' | 'spots' | 'finds';
+  onTabChange: (tab: 'scan' | 'spots' | 'finds') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onOpenApiKeyModal}
             title={apiKeySet ? 'Gemini API Key configured' : 'Click to add Gemini API Key'}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-sans font-bold transition-all border ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-sans font-bold transition-all border cursor-pointer ${
               apiKeySet
                 ? 'bg-[#8FBBAA]/20 text-[#16393D] border-[#8FBBAA] hover:bg-[#8FBBAA]/40'
                 : 'bg-[#D98C93]/20 text-[#16393D] border-[#D98C93] hover:bg-[#D98C93]/40 animate-pulse'
@@ -55,21 +55,32 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           {/* Quick Tab Switch buttons for Desktop Header */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-1.5">
             <button
               onClick={() => onTabChange('scan')}
-              className={`flex items-center gap-2 px-6 py-2 rounded-full text-xs font-sans font-bold shadow-xs transition-all ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-sans font-bold shadow-xs transition-all cursor-pointer ${
                 activeTab === 'scan'
                   ? 'bg-[#16393D] text-[#F0EAD9]'
                   : 'bg-[#8FBBAA] text-[#16393D] hover:bg-[#8FBBAA]/80'
               }`}
             >
               <Compass className="w-4 h-4" />
-              Scan Shell
+              Scan Specimen
+            </button>
+            <button
+              onClick={() => onTabChange('spots')}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-sans font-bold shadow-xs transition-all cursor-pointer ${
+                activeTab === 'spots'
+                  ? 'bg-[#16393D] text-[#F0EAD9]'
+                  : 'bg-[#8FBBAA] text-[#16393D] hover:bg-[#8FBBAA]/80'
+              }`}
+            >
+              <MapPin className="w-4 h-4" />
+              Find a Spot
             </button>
             <button
               onClick={() => onTabChange('finds')}
-              className={`flex items-center gap-2 px-6 py-2 rounded-full text-xs font-sans font-bold shadow-xs transition-all ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-sans font-bold shadow-xs transition-all cursor-pointer ${
                 activeTab === 'finds'
                   ? 'bg-[#16393D] text-[#F0EAD9]'
                   : 'bg-[#8FBBAA] text-[#16393D] hover:bg-[#8FBBAA]/80'
@@ -84,3 +95,4 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+

@@ -7,6 +7,7 @@ import { ApiKeyModal } from './components/ApiKeyModal';
 import { CameraScanner } from './components/CameraScanner';
 import { SpecimenCard } from './components/SpecimenCard';
 import { MyFindsTab } from './components/MyFindsTab';
+import { FindSpotTab } from './components/FindSpotTab';
 import {
   getStoredApiKey,
   setStoredApiKey,
@@ -16,7 +17,7 @@ import {
   getCurrentBeachLocation,
 } from './utils/storage';
 import { ShellIdentification, LocationInfo, SavedFind, SampleShell } from './types';
-import { Compass, BookMarked, Shell, RefreshCw, AlertCircle } from 'lucide-react';
+import { Compass, BookMarked, Shell, RefreshCw, AlertCircle, MapPin } from 'lucide-react';
 
 export default function App() {
   // State initialization
@@ -24,7 +25,7 @@ export default function App() {
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState<boolean>(false);
   const [savedFinds, setSavedFinds] = useState<SavedFind[]>([]);
   
-  const [activeTab, setActiveTab] = useState<'scan' | 'finds'>('scan');
+  const [activeTab, setActiveTab] = useState<'scan' | 'spots' | 'finds'>('scan');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,10 +56,10 @@ export default function App() {
   };
 
   // Perform AI identification via server API route /api/identify
-  const handleAnalyzePhoto = async (base64Data: string, mimeType: string) => {
+  const handleAnalyzePhoto = async (topViewBase64: string, apertureViewBase64: string, profileViewBase64?: string) => {
     setIsLoading(true);
     setError(null);
-    setCurrentPhoto(base64Data);
+    setCurrentPhoto(topViewBase64);
 
     // Fetch device location concurrently
     const loc = await getCurrentBeachLocation();
@@ -72,8 +73,9 @@ export default function App() {
           ...(apiKey ? { 'x-gemini-key': apiKey } : {}),
         },
         body: JSON.stringify({
-          imageBase64: base64Data,
-          mimeType,
+          topViewBase64,
+          apertureViewBase64,
+          profileViewBase64,
           customApiKey: apiKey,
         }),
       });
@@ -81,7 +83,7 @@ export default function App() {
       const json = await response.json();
 
       if (!response.ok || !json.success) {
-        throw new Error(json.error || 'Failed to identify seashell specimen.');
+        throw new Error(json.error || 'Failed to identify specimen.');
       }
 
       setCurrentIdentification(json.data);
@@ -89,7 +91,7 @@ export default function App() {
       window.scrollTo({ top: 120, behavior: 'smooth' });
     } catch (err: any) {
       console.error('Identification Error:', err);
-      setError(err?.message || 'Failed to analyze shell image. Please verify API key in settings or try another photo.');
+      setError(err?.message || 'Failed to analyze specimen image. Please verify API key in settings or try another photo.');
     } finally {
       setIsLoading(false);
     }
@@ -161,9 +163,9 @@ export default function App() {
 
                   <button
                     onClick={handleResetScan}
-                    className="py-1.5 px-3 bg-[#16393D] text-[#FAF6ED] hover:bg-[#16393D]/90 rounded-md text-xs font-bold font-serif shadow-xs flex items-center gap-1 transition-colors"
+                    className="py-1.5 px-3 bg-[#16393D] text-[#FAF6ED] hover:bg-[#16393D]/90 rounded-md text-xs font-bold font-serif shadow-xs flex items-center gap-1 transition-colors cursor-pointer"
                   >
-                    <RefreshCw className="w-3.5 h-3.5" /> Scan Another Shell
+                    <RefreshCw className="w-3.5 h-3.5" /> Scan Another Specimen
                   </button>
                 </div>
 
@@ -172,6 +174,7 @@ export default function App() {
                   identification={currentIdentification}
                   location={currentLocation}
                   onSaveFind={handleSaveCurrentFind}
+                  onResetScan={handleResetScan}
                 />
               </div>
             ) : (
@@ -184,6 +187,9 @@ export default function App() {
               />
             )}
           </div>
+        ) : activeTab === 'spots' ? (
+          /* Find a Spot Tab */
+          <FindSpotTab savedFinds={savedFinds} apiKey={apiKey} />
         ) : (
           /* My Finds Tab */
           <MyFindsTab
@@ -203,23 +209,35 @@ export default function App() {
       />
 
       {/* Mobile Bottom Floating Navigation Bar */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#FAF6ED]/95 backdrop-blur-md border-t-2 border-[#16393D]/20 px-6 py-2 shadow-lg">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#FAF6ED]/95 backdrop-blur-md border-t-2 border-[#16393D]/20 px-4 py-2 shadow-lg">
         <div className="max-w-md mx-auto flex items-center justify-around">
           <button
             onClick={() => setActiveTab('scan')}
-            className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+            className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors cursor-pointer ${
               activeTab === 'scan'
                 ? 'text-[#16393D] font-bold'
                 : 'text-[#16393D]/60 hover:text-[#16393D]'
             }`}
           >
             <Compass className="w-5 h-5" />
-            <span className="text-[10px] font-mono-tag tracking-wider uppercase">Scan Shell</span>
+            <span className="text-[10px] font-mono-tag tracking-wider uppercase">Scan</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('spots')}
+            className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors cursor-pointer ${
+              activeTab === 'spots'
+                ? 'text-[#16393D] font-bold'
+                : 'text-[#16393D]/60 hover:text-[#16393D]'
+            }`}
+          >
+            <MapPin className="w-5 h-5" />
+            <span className="text-[10px] font-mono-tag tracking-wider uppercase">Find Spot</span>
           </button>
 
           <button
             onClick={() => setActiveTab('finds')}
-            className={`flex flex-col items-center gap-1 p-2 rounded-lg relative transition-colors ${
+            className={`flex flex-col items-center gap-1 p-2 rounded-lg relative transition-colors cursor-pointer ${
               activeTab === 'finds'
                 ? 'text-[#16393D] font-bold'
                 : 'text-[#16393D]/60 hover:text-[#16393D]'
