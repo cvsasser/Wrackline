@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #F0EAD9;
+    color: #16393D;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  .font-mono-tag {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom field guide specimen tag styling */
+.specimen-tag {
+  background-color: #FAF6ED;
+  border: 2px dashed #16393D;
+  box-shadow: 3px 3px 0px rgba(22, 57, 61, 0.15);
+  position: relative;
+}
+
+.specimen-punch-hole {
+  width: 14px;
+  height: 14px;
+  background-color: #F0EAD9;
+  border: 2px solid #16393D;
+  border-radius: 50%;
+  position: absolute;
+}
+
+/* Stamp watermark effect */
+.field-stamp {
+  font-family: 'Playfair Display', serif;
+  border: 2px solid #D98C93;
+  color: #D98C93;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transform: rotate(-3deg);
+  display: inline-block;
+  padding: 2px 8px;
+  font-weight: 700;
+  border-radius: 4px;
+}
