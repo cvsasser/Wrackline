@@ -280,7 +280,7 @@ Detail what substrate to look in (shell hash bands, gravel bars, low-tide mudfla
 If this species or specimen type is legally protected or restricted (e.g. live harvesting prohibitions, stony coral protection laws under CITES/state laws, state park collection limits), clearly detail those restrictions and emphasize ethical beachcombing ("take only empty shells/fossils, leave living creatures").`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.6-flash',
+        model: 'gemini-3-flash',
         contents: promptText,
         config: {
           tools: [{ googleSearch: {} }],
