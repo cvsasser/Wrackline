@@ -280,6 +280,8 @@ Detail what substrate to look in (shell hash bands, gravel bars, low-tide mudfla
 If this species or specimen type is legally protected or restricted (e.g. live harvesting prohibitions, stony coral protection laws under CITES/state laws, state park collection limits), clearly detail those restrictions and emphasize ethical beachcombing ("take only empty shells/fossils, leave living creatures").`;
 
       let response;
+      let isGroundedAttemptSucceeded = false;
+
       try {
         // Try Google Search Grounding with gemma-4-26b-a4b-it (verified working model with googleSearch tool enabled)
         response = await ai.models.generateContent({
@@ -289,6 +291,7 @@ If this species or specimen type is legally protected or restricted (e.g. live h
             tools: [{ googleSearch: {} }],
           },
         });
+        isGroundedAttemptSucceeded = true;
       } catch (groundingError: any) {
         console.warn('Search grounding model attempt encountered quota or tool restriction, falling back to gemini-3.6-flash model knowledge:', groundingError?.message || groundingError);
         // Fallback to standard content generation with gemini-3.6-flash if search tool quota/limits are triggered
@@ -296,6 +299,7 @@ If this species or specimen type is legally protected or restricted (e.g. live h
           model: 'gemini-3.6-flash',
           contents: promptText,
         });
+        isGroundedAttemptSucceeded = false;
       }
 
       const guideText = response.text || 'No location information found.';
@@ -304,6 +308,8 @@ If this species or specimen type is legally protected or restricted (e.g. live h
       const groundingMetadata = response.candidates?.[0]?.groundingMetadata;
       const groundingChunks = groundingMetadata?.groundingChunks || [];
       const webSearchQueries = groundingMetadata?.webSearchQueries || [];
+
+      const isGrounded = isGroundedAttemptSucceeded && groundingChunks.length > 0;
 
       const sources = groundingChunks
         .map((chunk: any) => ({
@@ -320,6 +326,7 @@ If this species or specimen type is legally protected or restricted (e.g. live h
         success: true,
         speciesName: speciesName.trim(),
         guide: guideText,
+        isGrounded,
         sources: uniqueSources,
         searchQueries: webSearchQueries,
         userLocation: lat !== undefined && lon !== undefined ? { lat, lon } : null,

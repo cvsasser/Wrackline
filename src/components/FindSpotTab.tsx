@@ -109,6 +109,7 @@ export const FindSpotTab: React.FC<FindSpotTabProps> = ({ savedFinds, apiKey }) 
       setResult({
         speciesName: data.speciesName,
         guide: data.guide,
+        isGrounded: Boolean(data.isGrounded),
         sources: data.sources || [],
         searchQueries: data.searchQueries || [],
         userLocation: data.userLocation,
@@ -135,13 +136,19 @@ export const FindSpotTab: React.FC<FindSpotTabProps> = ({ savedFinds, apiKey }) 
       <div className="bg-[#FAF6ED] rounded-2xl border-2 border-[#16393D] p-5 sm:p-7 shadow-sm space-y-4">
         <div className="flex items-start justify-between gap-3 flex-wrap sm:flex-nowrap">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[10px] font-sans font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-[#8FBBAA]/30 text-[#16393D] border border-[#8FBBAA]/60">
                 FIELD HABITAT MAPPER
               </span>
-              <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-[#16393D]/60 flex items-center gap-1">
-                <Globe className="w-3 h-3 text-[#16393D]" /> Web Search Grounded
-              </span>
+              {result && !result.isGrounded ? (
+                <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-[#B44C33] bg-[#E5A882]/20 px-2 py-0.5 rounded border border-[#B44C33]/40 flex items-center gap-1">
+                  <ShieldAlert className="w-3 h-3 text-[#B44C33]" /> General Knowledge — Not Independently Verified
+                </span>
+              ) : (
+                <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-[#16393D]/70 bg-[#8FBBAA]/30 px-2 py-0.5 rounded border border-[#8FBBAA]/60 flex items-center gap-1">
+                  <Globe className="w-3 h-3 text-[#16393D]" /> Web Search Grounded
+                </span>
+              )}
             </div>
             <h2 className="text-2xl sm:text-3xl font-black font-display text-[#16393D] tracking-tight">
               Find a Spot
@@ -318,9 +325,15 @@ export const FindSpotTab: React.FC<FindSpotTabProps> = ({ savedFinds, apiKey }) 
                   LOCATION GUIDE RESULT
                 </span>
 
-                <span className="text-xs font-sans font-bold text-[#16393D] bg-[#8FBBAA]/30 px-2.5 py-0.5 rounded border border-[#8FBBAA]/60 flex items-center gap-1">
-                  <Globe className="w-3.5 h-3.5 text-[#16393D]" /> Grounded Web Search
-                </span>
+                {result.isGrounded ? (
+                  <span className="text-xs font-sans font-bold text-[#16393D] bg-[#8FBBAA]/30 px-2.5 py-0.5 rounded border border-[#8FBBAA]/60 flex items-center gap-1 shadow-xs">
+                    <Globe className="w-3.5 h-3.5 text-[#16393D]" /> Grounded Web Search
+                  </span>
+                ) : (
+                  <span className="text-xs font-sans font-bold text-[#B44C33] bg-[#E5A882]/25 px-2.5 py-0.5 rounded border border-[#B44C33]/50 flex items-center gap-1 shadow-xs">
+                    <ShieldAlert className="w-3.5 h-3.5 text-[#B44C33]" /> General Knowledge — Not Independently Verified
+                  </span>
+                )}
               </div>
 
               <h3 className="text-2xl sm:text-3xl font-black font-display text-[#16393D] tracking-tight">

@@ -57,6 +57,7 @@ export interface GroundingSource {
 export interface SpotLocationResult {
   speciesName: string;
   guide: string;
+  isGrounded?: boolean;
   sources: GroundingSource[];
   searchQueries?: string[];
   userLocation?: { lat: number; lon: number } | null;
