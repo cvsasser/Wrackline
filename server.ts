@@ -279,13 +279,24 @@ Detail what substrate to look in (shell hash bands, gravel bars, low-tide mudfla
 ## Conservation & Legal Collection Restrictions
 If this species or specimen type is legally protected or restricted (e.g. live harvesting prohibitions, stony coral protection laws under CITES/state laws, state park collection limits), clearly detail those restrictions and emphasize ethical beachcombing ("take only empty shells/fossils, leave living creatures").`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash',
-        contents: promptText,
-        config: {
-          tools: [{ googleSearch: {} }],
-        },
-      });
+      let response;
+      try {
+        // Try Google Search Grounding with gemma-4-26b-a4b-it (verified working model with googleSearch tool enabled)
+        response = await ai.models.generateContent({
+          model: 'gemma-4-26b-a4b-it',
+          contents: promptText,
+          config: {
+            tools: [{ googleSearch: {} }],
+          },
+        });
+      } catch (groundingError: any) {
+        console.warn('Search grounding model attempt encountered quota or tool restriction, falling back to gemini-3.6-flash model knowledge:', groundingError?.message || groundingError);
+        // Fallback to standard content generation with gemini-3.6-flash if search tool quota/limits are triggered
+        response = await ai.models.generateContent({
+          model: 'gemini-3.6-flash',
+          contents: promptText,
+        });
+      }
 
       const guideText = response.text || 'No location information found.';
 
